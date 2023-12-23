@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CategoryEventServiceImpl implements CategoryEventService {
+public class CategoryEventServiceImpl implements logonedigital.webappapi.service.categoryEvent.CategoryEventService {
     private final CategoryEventRepo categoryEventRepo;
 
 
