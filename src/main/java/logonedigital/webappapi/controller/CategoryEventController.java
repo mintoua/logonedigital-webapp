@@ -1,5 +1,7 @@
 package logonedigital.webappapi.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import logonedigital.webappapi.entity.CategoryEvent;
 import logonedigital.webappapi.service.categoryEvent.CategoryEventService;
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/categories_event")
 @Slf4j
+@Tag(name="CategoryEvent APIs")
 public class CategoryEventController {
 
     private final CategoryEventService categoryEventService;
@@ -21,6 +24,7 @@ public class CategoryEventController {
         this.categoryEventService = categoryEventService;
     }
 
+    @Operation(summary = "Add new CategoryEvent", description = "Add Category's event")
     @PostMapping(path = "/add")
     public ResponseEntity<CategoryEvent> addCategoryEvent(@Valid @RequestBody  CategoryEvent categoryEvent)
     {

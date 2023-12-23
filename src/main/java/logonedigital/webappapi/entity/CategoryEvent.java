@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Entity
 @ToString
 @Getter
@@ -16,7 +19,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class CategoryEvent  {
+public class CategoryEvent implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @NotNull(message = "This field couldn't be null")
