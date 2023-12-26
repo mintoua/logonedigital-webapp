@@ -1,4 +1,4 @@
-package logonedigital.webappapi.service.event;
+package logonedigital.webappapi.service.eventFeatures.event;
 
 import logonedigital.webappapi.entity.Event;
 import logonedigital.webappapi.exception.RessourceNotFoundException;
