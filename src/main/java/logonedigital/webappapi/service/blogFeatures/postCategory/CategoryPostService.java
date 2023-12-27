@@ -1,4 +1,4 @@
-package logonedigital.webappapi.service.blogFeatures;
+package logonedigital.webappapi.service.blogFeatures.postCategory;
 
 import logonedigital.webappapi.entity.PostCategory;
 

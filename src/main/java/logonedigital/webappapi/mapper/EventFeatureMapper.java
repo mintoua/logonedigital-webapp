@@ -1,5 +1,6 @@
 package logonedigital.webappapi.mapper;
 
+
 import logonedigital.webappapi.dto.eventFeaturesDTO.eventDTO.EventRequestDTO;
 import logonedigital.webappapi.dto.eventFeaturesDTO.eventParticipationDTOs.EventParticipantRequestDTO;
 import logonedigital.webappapi.entity.Event;
@@ -12,4 +13,5 @@ import org.springframework.context.annotation.Configuration;
 public interface EventFeatureMapper {
     Event fromEventRequestDTO(EventRequestDTO eventRequestDTO);
     EventParticipant fromEventParticipantRequestDRO(EventParticipantRequestDTO eventParticipantRequestDTO);
+
 }

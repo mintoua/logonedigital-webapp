@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostRequestDTO {
+public class PostReqDTO {
     @NotEmpty(message = "This field couldn't be empty")
     @NotBlank(message = "This field couldn't be blank")
     private String title;

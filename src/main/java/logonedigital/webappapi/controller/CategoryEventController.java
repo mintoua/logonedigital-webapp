@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/categories_event")
 @Slf4j
-@Tag(name="CategoryEvent APIs")
+@Tag(name="EventCategory APIs")
 public class CategoryEventController {
 
     private final CategoryEventService categoryEventService;

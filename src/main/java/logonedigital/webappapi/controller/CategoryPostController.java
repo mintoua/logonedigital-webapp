@@ -3,7 +3,7 @@ package logonedigital.webappapi.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import logonedigital.webappapi.entity.PostCategory;
-import logonedigital.webappapi.service.blogFeatures.CategoryPostService;
+import logonedigital.webappapi.service.blogFeatures.postCategory.CategoryPostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/categories_post")
 @Slf4j
-@Tag(name="CategoryPost APIs")
+@Tag(name="PostsCategory APIs")
 public class CategoryPostController {
     private final CategoryPostService categoryPostService;
 
