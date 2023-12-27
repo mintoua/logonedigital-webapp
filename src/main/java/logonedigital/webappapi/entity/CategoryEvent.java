@@ -30,4 +30,5 @@ public class CategoryEvent implements Serializable {
     @NotBlank(message = "This field couldn't be blank")
     private String designation;
     private String slug;
+
 }
