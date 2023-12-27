@@ -2,6 +2,7 @@ package logonedigital.webappapi.controller;
 
 import logonedigital.webappapi.entity.Question;
 import logonedigital.webappapi.service.quizz.IQuestionService;
+import logonedigital.webappapi.service.quizz.QuestionService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +23,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequiredArgsConstructor
 public class QuestionController {
 
-    private final IQuestionService questionService;
+    private final QuestionService questionService;
 
     @PostMapping("/create-new-question")
     public ResponseEntity<Question> createQuestion(@Valid @RequestBody Question question){
