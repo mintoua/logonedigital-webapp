@@ -24,26 +24,25 @@ public class Event implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String slug;
-    @NotEmpty (message = "Title couldn't be empty")
-    @NotBlank(message = "Title couldn't be blank")
     private String titre;
-    @NotEmpty (message = "Description couldn't be empty")
-    @NotBlank(message = "Description couldn't be blank")
     @Column(columnDefinition = "TEXT")
     private String description;
-    @NotNull(message = "Field couldn't be empty")
     @Temporal(TemporalType.DATE)
     private Date dateDeb;
-    @NotNull(message = "Field couldn't be empty")
     @Temporal(TemporalType.DATE)
     private Date dateFin;
-    @NotNull(message = "Field couldn't be empty")
+    @Temporal(TemporalType.DATE)
+    private Date createdAt;
+    @Temporal(TemporalType.DATE)
+    private Date updatedAt;
     private Double duree;
-    @NotNull(message = "Field couldn't be empty")
     private Integer nbPlace;
-    @NotEmpty (message = "Field couldn't be empty")
-    @NotBlank(message = "Field couldn't be blank")
     private String lieu;
+    @Column(columnDefinition = "TEXT")
     private String details;
+    @ManyToOne
+    private CategoryEvent categoryEvent;
+    @ManyToOne
+    private EventParticipant eventParticipant;
 
 }

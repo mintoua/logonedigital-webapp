@@ -1,14 +1,16 @@
 package logonedigital.webappapi.entity;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -17,6 +19,8 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class EventParticipant implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -24,9 +28,9 @@ public class EventParticipant implements Serializable {
     private Integer id;
     @Temporal(TemporalType.DATE)
     private Date dateInscription;
-    @NotEmpty(message = "field couldn't be empty")
-    @NotBlank(message = "field couldn't be blank")
     @Column(columnDefinition = "TEXT")
     private String raisonInscription;
+    @OneToMany(mappedBy = "eventParticipant")
+    private List<Event> events;
 
 }

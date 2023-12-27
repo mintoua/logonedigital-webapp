@@ -1,6 +1,7 @@
 package logonedigital.webappapi.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import logonedigital.webappapi.dto.eventFeaturesDTO.eventParticipationDTOs.EventParticipantRequestDTO;
 import logonedigital.webappapi.entity.EventParticipant;
 import logonedigital.webappapi.service.eventFeatures.eventParticipants.EventParticipantService;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,8 @@ public class EventParticipantController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/add")
-    public EventParticipant addEventParticipant(@RequestBody EventParticipant eventParticipant){
-        return this.eventParticipantService.addEventParticipant(eventParticipant);
+    public EventParticipant addEventParticipant(@RequestBody EventParticipantRequestDTO EventParticipantRequestDTO){
+        return this.eventParticipantService.addEventParticipant(EventParticipantRequestDTO);
     }
 
     @ResponseBody
