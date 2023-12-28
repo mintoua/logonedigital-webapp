@@ -23,7 +23,7 @@ public class Formation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    private String slug;
     private String titre;
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -31,11 +31,9 @@ public class Formation implements Serializable {
     private String objectifs;
     @Column(columnDefinition = "TEXT")
     private String contenu;
-
     private String imageUrl;
-    private float prix;
-
-    @Transient
-    private MultipartFile brochureFile;
+    private Float prix;
+    private String categorie;
+    private String brochureFile;
 
 }

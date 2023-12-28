@@ -34,9 +34,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event addEvent(EventRequestDTO eventRequestDTO) {
         Event event = this.eventFeatureMapper.fromEventRequestDTO(eventRequestDTO);
-        Optional<CategoryEvent> categoryEvent = this.categoryEventRepo.findById(eventRequestDTO.getIdCategoryEvent());
+        Optional<CategoryEvent> categoryEvent =
+                this.categoryEventRepo.findById
+                        (eventRequestDTO.getIdCategoryEvent());
         if(categoryEvent.isEmpty())
-            throw new RessourceNotFoundException("This category's event doesn't exist !");
+            throw new RessourceNotFoundException
+                    ("This category's event doesn't exist !");
         event.setCategoryEvent(categoryEvent.get());
         event.setCreatedAt(new Date());
         event.setSlug(Tool.slugify(event.getTitre()));
