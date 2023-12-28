@@ -20,11 +20,11 @@ public class FormationService implements IFormationService {
     @Override
     public FormationDto createFormation(FormationDto formationDto) {
     Formation formation =  new Formation();
-    formation.setSlug(Tool.slugify(formationDto.titre()));
     fromDto(formationDto, formation);
     return fromEntity(formationRepository.save(formation));
     }
-    private void fromDto(FormationDto formationDto, Formation formation) {
+    public void fromDto(FormationDto formationDto, Formation formation) {
+        formation.setSlug(Tool.slugify(formationDto.titre()));
         formation.setTitre(formationDto.titre());
         formation.setDescription(formationDto.description());
         formation.setObjectifs(formationDto.objectifs());
@@ -35,7 +35,7 @@ public class FormationService implements IFormationService {
         formation.setBrochureFile(formationDto.brochureUrl());
     }
 
-    private FormationDto fromEntity(Formation formation){
+    public FormationDto fromEntity(Formation formation){
         return new FormationDto(formation.getSlug(), formation.getTitre(),
                 formation.getDescription(), formation.getObjectifs(),
                 formation.getContenu(), formation.getImageUrl(),
