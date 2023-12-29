@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +20,5 @@ public class PostReqDTO {
     @NotEmpty(message = "This field couldn't be empty")
     @NotBlank(message = "This field couldn't be blank")
     private String slugPostCategory;
+    private MultipartFile imageFile;
 }

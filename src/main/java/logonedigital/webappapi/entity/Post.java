@@ -35,4 +35,6 @@ public class Post implements Serializable {
     private Date updatedAt;
     @ManyToOne(fetch = FetchType.EAGER)
     private PostCategory postCategory;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private FileData imgUrl;
 }

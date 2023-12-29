@@ -7,8 +7,11 @@ import logonedigital.webappapi.entity.Post;
 import logonedigital.webappapi.service.blogFeatures.post.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,10 +25,11 @@ public class PostController {
         this.postService = postService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(code = HttpStatus.CREATED)
     @ResponseBody
-    public Post addPost(@Valid @RequestBody PostReqDTO postReqDTO){
+    public Post addPost(@Valid @ModelAttribute  PostReqDTO postReqDTO) throws IOException {
+       //log.error("{}", postReqDTO.getImageUrl());
         return this.postService.addPost(postReqDTO);
     }
 

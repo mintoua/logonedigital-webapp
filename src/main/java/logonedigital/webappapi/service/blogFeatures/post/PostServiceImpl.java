@@ -7,9 +7,11 @@ import logonedigital.webappapi.exception.RessourceNotFoundException;
 import logonedigital.webappapi.mapper.BlogFeaturesMapper;
 import logonedigital.webappapi.repository.PostCategoryRepo;
 import logonedigital.webappapi.repository.PostRepo;
+import logonedigital.webappapi.service.fileManager.FileManager;
 import logonedigital.webappapi.utils.Tool;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,17 +21,19 @@ public class PostServiceImpl implements PostService {
     private final PostRepo postRepo;
     private final BlogFeaturesMapper mapper;
     private final PostCategoryRepo postCategoryRepo;
+    private final FileManager fileManager;
 
     public PostServiceImpl(PostRepo postRepo,
-                           BlogFeaturesMapper mapper, PostCategoryRepo postCategoryRepo) {
+                           BlogFeaturesMapper mapper, PostCategoryRepo postCategoryRepo, FileManager fileManager) {
         this.postRepo = postRepo;
         this.mapper = mapper;
         this.postCategoryRepo = postCategoryRepo;
+        this.fileManager = fileManager;
     }
 
 
     @Override
-    public Post addPost(PostReqDTO postReqDTO) {
+    public Post addPost(PostReqDTO postReqDTO) throws IOException {
         Post post = this.mapper.fromPostRequestDTO(postReqDTO);
         post.setCreatedAt(new Date());
         post.setSlug(Tool.slugify(post.getTitle()));
@@ -38,7 +42,7 @@ public class PostServiceImpl implements PostService {
         if(postCategory.isEmpty())
             throw new RessourceNotFoundException("Post Category's doesn't exist !");
         post.setPostCategory(postCategory.get());
-
+        post.setImgUrl(this.fileManager.uploadFile(postReqDTO.getImageFile()));
         return this.postRepo.save(post);
     }
 
