@@ -1,6 +1,9 @@
 package logonedigital.webappapi.service.formationFeatures;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import logonedigital.webappapi.dto.FormationDto;
 import logonedigital.webappapi.entity.Formation;
 import logonedigital.webappapi.repository.FormationRepository;
@@ -10,15 +13,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class FormationService implements IFormationService {
 
     private final FormationRepository formationRepository;
+    private final Validator validator;
 
     @Override
     public FormationDto createFormation(FormationDto formationDto) {
+        Set<ConstraintViolation<FormationDto>> violations =
+                validator.validate(formationDto);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
     Formation formation =  new Formation();
     fromDto(formationDto, formation);
     return fromEntity(formationRepository.save(formation));
