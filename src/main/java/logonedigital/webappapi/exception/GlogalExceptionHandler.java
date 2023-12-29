@@ -32,7 +32,7 @@ public class GlogalExceptionHandler {
 @ResponseBody
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 @ExceptionHandler(ResourceExistException.class)
-public ErrorMessage ResourceExceptionHandler(Exception ex){
+public ErrorMessage ResourceExistExceptionHandler(Exception ex){
         return ErrorMessage.build(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST.value(),

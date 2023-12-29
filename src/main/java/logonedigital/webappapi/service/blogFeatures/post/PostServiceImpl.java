@@ -3,17 +3,20 @@ package logonedigital.webappapi.service.blogFeatures.post;
 import logonedigital.webappapi.dto.blogFeaturesDTO.PostReqDTO;
 import logonedigital.webappapi.entity.Post;
 import logonedigital.webappapi.entity.PostCategory;
+import logonedigital.webappapi.exception.ResourceExistException;
 import logonedigital.webappapi.exception.RessourceNotFoundException;
 import logonedigital.webappapi.mapper.BlogFeaturesMapper;
 import logonedigital.webappapi.repository.PostCategoryRepo;
 import logonedigital.webappapi.repository.PostRepo;
 import logonedigital.webappapi.service.fileManager.FileManager;
 import logonedigital.webappapi.utils.Tool;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,7 +27,9 @@ public class PostServiceImpl implements PostService {
     private final FileManager fileManager;
 
     public PostServiceImpl(PostRepo postRepo,
-                           BlogFeaturesMapper mapper, PostCategoryRepo postCategoryRepo, FileManager fileManager) {
+                           BlogFeaturesMapper mapper,
+                           PostCategoryRepo postCategoryRepo,
+                           FileManager fileManager) {
         this.postRepo = postRepo;
         this.mapper = mapper;
         this.postCategoryRepo = postCategoryRepo;
@@ -34,7 +39,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post addPost(PostReqDTO postReqDTO) throws IOException {
+
+        //Check if current post has been created inside database
+        if(this.postRepo.fetchPostByTitle(postReqDTO.getTitle()).isPresent())
+            throw new ResourceExistException("This post has been created !");
+
         Post post = this.mapper.fromPostRequestDTO(postReqDTO);
+
         post.setCreatedAt(new Date());
         post.setSlug(Tool.slugify(post.getTitle()));
 
@@ -47,8 +58,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPosts() {
-        return this.postRepo.findAll();
+    public Page<Post> getPosts(int offset, int pageSize) {
+        return this.postRepo.findAll(PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 
     @Override
@@ -95,5 +106,12 @@ public class PostServiceImpl implements PostService {
 
         postDB.setUpdatedAt(new Date());
         return this.postRepo.saveAndFlush(postDB);
+    }
+
+    @Override
+    public Page<Post> getPostsByCategory(String postCategorySlug, int offset, int pageSize) {
+        return this.postRepo
+                .fetchPostByCategory(postCategorySlug,
+                        PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC, "title")));
     }
 }
