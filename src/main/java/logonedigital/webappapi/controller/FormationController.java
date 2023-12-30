@@ -7,6 +7,7 @@ import logonedigital.webappapi.entity.Formation;
 import logonedigital.webappapi.service.formationFeatures.FormationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,15 @@ public class FormationController {
     public ResponseEntity<Formation> createFormation(
             @Valid @RequestBody FormationDto formation
             ) throws IOException {
+        return ResponseEntity.status(CREATED).body(
+                formationService.createFormation(formation)
+        );
+    }
+    @ResponseBody
+    @PostMapping( path = "/add",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Formation> newFormation(
+            @Valid @ModelAttribute FormationDto formation
+    ) throws IOException {
         return ResponseEntity.status(CREATED).body(
                 formationService.createFormation(formation)
         );
