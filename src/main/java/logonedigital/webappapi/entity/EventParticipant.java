@@ -30,7 +30,7 @@ public class EventParticipant implements Serializable {
     private Date dateInscription;
     @Column(columnDefinition = "TEXT")
     private String raisonInscription;
-    @OneToMany(mappedBy = "eventParticipant")
+    @OneToMany
     private List<Event> events;
 
 }
