@@ -22,7 +22,7 @@ public class FileManagerImpl implements FileManager {
         this.fileDataRepo = fileDataRepo;
     }
 
-/*    @Override
+    @Override
     public FileData uploadFile(MultipartFile file) throws IOException {
         String fileName = Tool.generateFileName(file);
         String filePath = SomeConstants.IMG_PATH_FOLDER+"\\"+fileName;
@@ -32,24 +32,6 @@ public class FileManagerImpl implements FileManager {
                 fileName,
                 file.getContentType(),
                 filePath));
-    }*/
-
-    @Override
-    public FileData uploadFile(MultipartFile file) throws IOException {
-        String fileName = Tool.generateFileName(file);
-        String filePath;
-
-        // Determine path based on file type (assuming extension-based mapping):
-        if (file.getContentType().startsWith("image/")) {
-            filePath = SomeConstants.IMG_PATH_FOLDER + "\\" + fileName;
-        } else if (file.getContentType().startsWith("application/pdf")) {
-            filePath = SomeConstants.BROCHURE_PATH_FOLDER + "\\" + fileName;
-        } else {
-            throw new IllegalArgumentException("Unsupported file type");
-        }
-
-        file.transferTo(new File(filePath));
-        return this.fileDataRepo.save(FileData.build(null, fileName, file.getContentType(), filePath));
     }
 
     @Override

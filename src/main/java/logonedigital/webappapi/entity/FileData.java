@@ -13,8 +13,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "files_path")
 public class FileData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String fileName;
     private String type;

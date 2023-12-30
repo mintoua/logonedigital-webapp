@@ -17,7 +17,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@Table(name = "questions")
+
 public class Question implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
