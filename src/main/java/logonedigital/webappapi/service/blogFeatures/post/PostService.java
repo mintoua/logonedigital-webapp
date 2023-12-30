@@ -12,7 +12,7 @@ public interface PostService  {
     Page<Post> getPosts(int offset, int pageSize);
     Post getPost(String slug);
     void deletePost(String slug);
-    Post editPost(PostReqDTO postReqDTO, String slug);
+    Post editPost(PostReqDTO postReqDTO, String slug) throws IOException;
     Page<Post> getPostsByCategory(String postCategorySlug, int offset, int pageSize);
 
 }

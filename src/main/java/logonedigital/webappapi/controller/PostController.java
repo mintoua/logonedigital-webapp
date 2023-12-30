@@ -88,9 +88,9 @@ public class PostController {
             @ApiResponse(responseCode = "202", description = "Successfully edited!"),
             @ApiResponse(responseCode = "400", description = "Not found - Post doesn't exist inside data base")
     })
-    @PutMapping("/{slug}")
+    @PutMapping(path = "/{slug}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Post> updatePost(@PathVariable(name = "slug") String slug,
-                           @Valid @RequestBody PostReqDTO postReqDTO){
+                                           @Valid @ModelAttribute  PostReqDTO postReqDTO) throws IOException {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(this.postService.editPost(postReqDTO, slug));
     }

@@ -1,10 +1,15 @@
 package logonedigital.webappapi.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import logonedigital.webappapi.dto.eventFeaturesDTO.eventParticipationDTOs.EventParticipantRequestDTO;
+import logonedigital.webappapi.dto.eventFeaturesDTO.eventParticipationDTOs.EventParticipantReqDTO;
 import logonedigital.webappapi.entity.EventParticipant;
 import logonedigital.webappapi.service.eventFeatures.eventParticipants.EventParticipantService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,41 +23,61 @@ public class EventParticipantController {
     public EventParticipantController(EventParticipantService eventParticipantService) {
         this.eventParticipantService = eventParticipantService;
     }
-
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
+    //TODO ajouter un contrôle qui permettra de faire en sorte qu'une personne ne puisse pas s'inscrire 2 fois à un même évènement
+    @Operation(summary = "Add new EventParticipant", description = "return EventParticipant")
+    @ApiResponses(value = {
+            //@ApiResponse(responseCode = "400", description = "This Post already exist!"),
+            @ApiResponse(responseCode = "201", description = "Successfully saved!"),
+            @ApiResponse(responseCode = "400", description = "Fields validation failed!")
+    })
     @PostMapping(path = "/add")
-    public EventParticipant addEventParticipant(@RequestBody EventParticipantRequestDTO EventParticipantRequestDTO){
-        return this.eventParticipantService.addEventParticipant(EventParticipantRequestDTO);
+    public ResponseEntity<EventParticipant> addEventParticipant(@RequestBody EventParticipantReqDTO EventParticipantReqDTO){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(this.eventParticipantService.addEventParticipant(EventParticipantReqDTO));
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping
-    public List<EventParticipant> getEventParticipants(){
-        return this.eventParticipantService.getEventParticipants();
+    @Operation(summary = "G EventParticipants", description = "return EventParticipant with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully saved!")
+    })
+    @GetMapping(path = "/{offset}/{pageSize}")
+    public ResponseEntity<Page<EventParticipant>> getEventParticipants(@PathVariable(name = "offset") int offset, @PathVariable(name = "pageSize") int pageSize){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(this.eventParticipantService.getEventParticipants(offset,pageSize));
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get EventParticipant by ID", description = "return an EventParticipant as per ID")
+    @ApiResponses(value = {
+            //@ApiResponse(responseCode = "400", description = "This Post already exist!"),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieve!"),
+            @ApiResponse(responseCode = "404", description = "Not found - EventParticipant not found!")
+    })
     @GetMapping(path = "{id}")
-    public EventParticipant getEventParticipant(@PathVariable(name = "id") Integer id){
-        return this.eventParticipantService.getEventParticipant(id);
+    public ResponseEntity<EventParticipant> getEventParticipant(@PathVariable(name = "id") Integer id){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(this.eventParticipantService.getEventParticipant(id));
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Edit EventParticipant by ID", description = "return edited EventParticipant")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Successfully edited!"),
+            @ApiResponse(responseCode = "400", description = "Fields validation failed!")
+    })
     @PutMapping(path = "/updated/{id}")
-    public EventParticipant updateEventParticipant(@PathVariable(name = "id") Integer id,
+    public ResponseEntity<EventParticipant> updateEventParticipant(@PathVariable(name = "id") Integer id,
                                                    @RequestBody EventParticipant eventParticipant){
-        return this.eventParticipantService.updateEventParticipant(id, eventParticipant);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(this.eventParticipantService.updateEventParticipant(id, eventParticipant));
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Deleted EventParticipant by ID", description = "return EventParticipant successfully deleted")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Successfully deleted!"),
+    })
     @DeleteMapping(path = "/deleted/{id}")
-    public String deleteEventParticipant(@PathVariable(name = "id") Integer id){
+    public ResponseEntity<String> deleteEventParticipant(@PathVariable(name = "id") Integer id){
         this.eventParticipantService.deleteEventParticipant(id);
-        return "This subscription deleted successfully !";
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body("This subscription deleted successfully !");
     }
 }

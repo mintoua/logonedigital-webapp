@@ -81,31 +81,33 @@ public class PostServiceImpl implements PostService {
 
         this.postRepo.delete(post.get());
     }
-
-    @Override
-    public Post editPost(PostReqDTO postReqDTO, String slug) {
-        Optional<Post> post = this.postRepo.findBySlug(slug);
-        if (post.isEmpty())
-            throw new RessourceNotFoundException("This post doesn't exist!");
-        Post postDB = post.get();
-        //TODO refactoriser ce controller avec une fonction private
+    private Post setPostProperties(Post post, PostReqDTO postReqDTO) throws IOException {
         if(!postReqDTO.getTitle().isEmpty()
-                && !postReqDTO.getTitle().equals(postDB.getTitle())){
-            postDB.setTitle(postReqDTO.getTitle());
-            postDB.setSlug(Tool.slugify(postReqDTO.getTitle()));
+                && !postReqDTO.getTitle().equals(post.getTitle())){
+            post.setTitle(postReqDTO.getTitle());
+            post.setSlug(Tool.slugify(postReqDTO.getTitle()));
         }
 
         if (!postReqDTO.getContent().isEmpty()
-                && !postReqDTO.getContent().equals(postDB.getContent()))
-            postDB.setContent(postReqDTO.getContent());
-        //TODO ajouter la condition pour vérifier si la catégorie n'est pas vie et n'est pas identique à celle existante
+                && !postReqDTO.getContent().equals(post.getContent()))
+            post.setContent(postReqDTO.getContent());
         Optional<PostCategory> postCategory = this.postCategoryRepo.findBySlug(postReqDTO.getSlugPostCategory());
         if(postCategory.isEmpty())
             throw new RessourceNotFoundException("Post Category's doesn't exist !");
-        postDB.setPostCategory(postCategory.get());
+        post.setPostCategory(postCategory.get());
+        post.setUpdatedAt(new Date());
+        //TODO Régler le problème d'upload d'image lors de l'update
+        //post.setImgUrl(this.fileManager.uploadFile(postReqDTO.getImageFile()));
+        return post;
+    }
+    @Override
+    public Post editPost(PostReqDTO postReqDTO, String slug) throws IOException {
+        Optional<Post> post = this.postRepo.findBySlug(slug);
+        if (post.isEmpty())
+            throw new RessourceNotFoundException("This post doesn't exist!");
 
-        postDB.setUpdatedAt(new Date());
-        return this.postRepo.saveAndFlush(postDB);
+       this.setPostProperties(post.get(),postReqDTO);
+        return this.postRepo.saveAndFlush(this.setPostProperties(post.get(),postReqDTO));
     }
 
     @Override

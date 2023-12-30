@@ -1,18 +1,18 @@
-package logonedigital.webappapi.dto.blogFeaturesDTO;
+package logonedigital.webappapi.dto.eventFeaturesDTO.eventCategoryReqDTO;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class PostCategoryReqDTO {
+public class EventCategoryDTO {
+    @NotNull(message = "This field couldn't be null")
     @NotEmpty(message = "This field couldn't be empty")
     @NotBlank(message = "This field couldn't be blank")
-    private String title;
+    private String designation;
 }

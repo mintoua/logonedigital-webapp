@@ -1,12 +1,15 @@
 package logonedigital.webappapi.service.eventFeatures.eventParticipants;
 
-import logonedigital.webappapi.dto.eventFeaturesDTO.eventParticipationDTOs.EventParticipantRequestDTO;
+import logonedigital.webappapi.dto.eventFeaturesDTO.eventParticipationDTOs.EventParticipantReqDTO;
 import logonedigital.webappapi.entity.Event;
 import logonedigital.webappapi.entity.EventParticipant;
 import logonedigital.webappapi.exception.RessourceNotFoundException;
 import logonedigital.webappapi.mapper.EventFeatureMapper;
 import logonedigital.webappapi.repository.EventParticipantRepository;
 import logonedigital.webappapi.repository.EventRepo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -32,20 +35,30 @@ public class EventParticipantServiceImpl implements EventParticipantService {
 
 
     @Override
-    public EventParticipant addEventParticipant(EventParticipantRequestDTO eventParticipantRequestDTO) {
-        EventParticipant eventParticipant = this.eventFeatureMapper.fromEventParticipantRequestDRO(eventParticipantRequestDTO);
+    public EventParticipant addEventParticipant(EventParticipantReqDTO eventParticipantReqDTO) {
+        EventParticipant eventParticipant = this.eventFeatureMapper.fromEventParticipantRequestDRO(eventParticipantReqDTO);
 
         eventParticipant.setDateInscription(new Date());
-        Optional<Event> event = this.eventRepo.findBySlug(eventParticipantRequestDTO.getEventSlug());
+        Optional<Event> event = this.eventRepo.findBySlug(eventParticipantReqDTO.getEventSlug());
         if(event.isEmpty())
             throw new RessourceNotFoundException("This event dont exist !");
         eventParticipant.setEvents(Collections.singletonList(event.get()));
+
+        //Réduire le nombre de place total à chaque inscription
+        this.reduceTotalPlace(event.get(),eventParticipantReqDTO.getEventSlug());
+
         return this.eventParticipantRepo.save(eventParticipant);
     }
 
+    private void reduceTotalPlace(Event event, String slug){
+
+        event.setNbPlaceRestante(event.getNbPlaceRestante() -1);
+        this.eventRepo.saveAndFlush(event);
+    }
+
     @Override
-    public List<EventParticipant> getEventParticipants() {
-        return this.eventParticipantRepo.findAll();
+    public Page<EventParticipant> getEventParticipants(int offset, int pageSize) {
+        return this.eventParticipantRepo.findAll(PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC,"dateInscription")));
     }
 
     @Override
