@@ -6,11 +6,15 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import logonedigital.webappapi.dto.FormationDto;
 import logonedigital.webappapi.entity.Formation;
+import logonedigital.webappapi.exception.ResourceExistException;
+import logonedigital.webappapi.mapper.FormationMapper;
 import logonedigital.webappapi.repository.FormationRepository;
+import logonedigital.webappapi.service.fileManager.FileManager;
 import logonedigital.webappapi.utils.Tool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,38 +24,24 @@ import java.util.Set;
 public class FormationService implements IFormationService {
 
     private final FormationRepository formationRepository;
-    private final Validator validator;
+    private final FormationMapper formationMapper;
+    private final FileManager fileManager;
 
     @Override
-    public FormationDto createFormation(FormationDto formationDto) {
-        Set<ConstraintViolation<FormationDto>> violations =
-                validator.validate(formationDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
-    Formation formation =  new Formation();
-    fromDto(formationDto, formation);
-    return fromEntity(formationRepository.save(formation));
+    public Formation createFormation(FormationDto formationDto) throws IOException {
+    if (formationRepository.findFormationByTitre(formationDto.titre()).isPresent())
+    {
+        throw new ResourceExistException("Une formation avec ce titre existe déjà!!!");
     }
-    public void fromDto(FormationDto formationDto, Formation formation) {
-        formation.setSlug(Tool.slugify(formationDto.titre()));
-        formation.setTitre(formationDto.titre());
-        formation.setDescription(formationDto.description());
-        formation.setObjectifs(formationDto.objectifs());
-        formation.setContenu(formationDto.contenu());
-        formation.setImageUrl(formationDto.imageUrl());
-        formation.setPrix(formationDto.prix());
-        formation.setCategorie(formationDto.categorie());
-        formation.setBrochureFile(formationDto.brochureUrl());
+    Formation formation =  formationMapper.formationDtoToEntity(formationDto);
+    formation.setSlug(Tool.slugify(formation.getTitre()));
+    formation.setImageUrl(fileManager.uploadFile(formationDto.imageUrl()));
+    formation.setBrochureFile(fileManager.uploadFile(formationDto.brochureUrl()));
+    return formationRepository.save(formation);
     }
 
-    public FormationDto fromEntity(Formation formation){
-        return new FormationDto(formation.getSlug(), formation.getTitre(),
-                formation.getDescription(), formation.getObjectifs(),
-                formation.getContenu(), formation.getImageUrl(),
-                formation.getPrix(), formation.getCategorie(),
-                formation.getBrochureFile());
-    }
+
+
     @Override
     public Formation getFormationById(Integer id) {
         return formationRepository.findById(id)
@@ -59,13 +49,13 @@ public class FormationService implements IFormationService {
     }
 
     @Override
-    public FormationDto getFormationBySlug(String slug) {
+    public Formation getFormationBySlug(String slug) {
         Optional<Formation> isFormation = formationRepository.findBySlug(slug);
         if(isFormation.isEmpty()){
-            throw new EntityNotFoundException("Formation not found with slug: " + slug);
+            throw new EntityNotFoundException("Formation not found with the slug: " + slug);
         }
-        Formation formation = isFormation.get();
-        return fromEntity(formation);
+
+        return isFormation.get();
     }
 
     @Override
@@ -73,31 +63,32 @@ public class FormationService implements IFormationService {
         return formationRepository.findAll();
     }
 
+
+
     @Override
-    public FormationDto updateFormation(String slug, FormationDto updatedFormation) {
+    public Formation updateFormation(String slug, FormationDto updatedFormation) throws IOException {
+        Optional<Formation> isFormation = formationRepository.findBySlug(slug);
+        if(isFormation.isPresent()){
+            Formation existingFormation =  isFormation.get();
+            return this.createFormation(updatedFormation);
+        }
+        else{
+            throw new EntityNotFoundException("Formation not found with slug: " + slug);
+        }
+    }
+
+    @Override
+    public void deleteFormation(String slug) {
         Optional<Formation> isFormation = formationRepository.findBySlug(slug);
         if(isFormation.isEmpty()){
             throw new EntityNotFoundException("Formation not found with slug: " + slug);
         }
-        Formation existingFormation =  isFormation.get();
-        fromDto(updatedFormation, existingFormation);
-
-        return fromEntity(formationRepository.save(existingFormation));
+        formationRepository.delete(isFormation.get());
     }
 
     @Override
-    public void deleteFormation(Integer id) {
-        Formation formationToDelete = getFormationById(id);
-        formationRepository.delete(formationToDelete);
+    public List<Formation> getFormationsByCategorie(String categorie) {
+        return formationRepository.findFormationsByCategorie(categorie);
     }
-
-    @Override
-    public List<FormationDto> getAllFormationsCategorie(String categorie) {
-        return formationRepository.findFormationsByCategorie(categorie)
-                .stream().map(
-                        this::fromEntity
-                ).toList();
-    }
-
 
 }

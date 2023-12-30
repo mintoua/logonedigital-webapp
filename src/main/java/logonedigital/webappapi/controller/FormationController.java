@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -24,10 +25,9 @@ public class FormationController {
 
     @ResponseBody
     @PostMapping("/new")
-    public ResponseEntity<FormationDto> createFormation(
+    public ResponseEntity<Formation> createFormation(
             @Valid @RequestBody FormationDto formation
-            )
-    {
+            ) throws IOException {
         return ResponseEntity.status(CREATED).body(
                 formationService.createFormation(formation)
         );
@@ -42,8 +42,18 @@ public class FormationController {
     }
 
     @ResponseBody
+    @GetMapping("/{categorie}")
+    public ResponseEntity<List<Formation>> getFormationsByCategorie(
+            @PathVariable(name = "categorie") String categorie
+    ){
+        return ResponseEntity.ok(
+                formationService.getFormationsByCategorie(categorie)
+        );
+    }
+
+    @ResponseBody
     @GetMapping("/{slug}")
-    public ResponseEntity<FormationDto> getFormation(
+    public ResponseEntity<Formation> getFormation(
             @PathVariable(name = "slug") String slug){
 
         return ResponseEntity.ok(formationService.getFormationBySlug(slug));
@@ -52,16 +62,18 @@ public class FormationController {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     @PutMapping("/edit/{slug}")
-    public ResponseEntity<FormationDto> updateFormation(
+    public ResponseEntity<Formation> updateFormation(
             @PathVariable(name = "slug") String slug,
             @RequestBody FormationDto formationDto
-    ){
+    ) throws IOException {
         return ResponseEntity.ok(formationService.updateFormation(slug,formationDto));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable Integer id){
-        formationService.deleteFormation(id);
+    @DeleteMapping("/delete/{slug}")
+    public ResponseEntity<Void> deleteQuestion(@PathVariable(name = "slug") String slug){
+        formationService.deleteFormation(slug);
         return ResponseEntity.noContent().build();
     }
+
+
 }

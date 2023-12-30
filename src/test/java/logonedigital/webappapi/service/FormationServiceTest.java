@@ -1,58 +1,96 @@
 package logonedigital.webappapi.service;
 
 import logonedigital.webappapi.dto.FormationDto;
+import logonedigital.webappapi.entity.FileData;
 import logonedigital.webappapi.entity.Formation;
+import logonedigital.webappapi.mapper.FormationMapper;
 import logonedigital.webappapi.repository.FormationRepository;
+import logonedigital.webappapi.service.fileManager.FileManager;
 import logonedigital.webappapi.service.formationFeatures.FormationService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
+
+
+@SpringBootTest
 public class FormationServiceTest {
 
-    @Mock
-    private FormationRepository formationRepository;
-
+    @Autowired
     private FormationService formationService;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        formationService = new FormationService(formationRepository);
-    }
+    @MockBean
+    private FormationMapper formationMapper;
 
-/*    @Test
-    public void createFormationShouldReturnFormation() {
-        // Create a FormationDto with test data
-        FormationDto formationDto = new FormationDto(
-                "",
-                "FullStack MEAN",
-                "Formation Fullstack JS MongoDBExpressAngularNodeJs",
-                "Devenir Dev Fullstack JS",
-                "M E A N",
-                "/image",
-                1500.0f,
-                "Web",
-                "/borchure"
+    @MockBean
+    private FileManager fileManager;
+
+    @MockBean
+    private FormationRepository formationRepository;
+
+    @Test
+    public void testGetFormationsByCategorie() {
+
+        String categorie = "Test Category";
+        List<Formation> expectedFormations = Arrays.asList(
+                new Formation(1, "Formation 1", "Description 1", 10.99f, categorie),
+                new Formation(2, "Formation 2", "Description 2", 19.99f, categorie)
         );
 
-        // Call the createFormation method
-        FormationDto createdFormationDto = formationService.createFormation(formationDto);
+        // Configure mock behavior
+        when(formationRepository.findFormationsByCategorie(categorie))
+                .thenReturn(expectedFormations);
 
-        // Verify that the repository's save method was called with the correct Formation object
-        ArgumentCaptor<Formation> formationCaptor = ArgumentCaptor.forClass(Formation.class);
-        Mockito.verify(formationRepository).save(formationCaptor.capture());
+        // Call the service method
+        List<Formation> actualFormations = formationService.getFormationsByCategorie(categorie);
 
-        // Assert that the captured Formation object matches the expected values
-        Formation savedFormation = formationCaptor.getValue();
-        assertEquals(formationDto.slug(), savedFormation.getSlug());
-        assertEquals(formationDto.titre(), savedFormation.getTitre());
-        // ... (add assertions for other fields as needed)
-    }*/
+        // Verify results
+        assertEquals(expectedFormations, actualFormations);
+        // Optionally verify interactions with the repository
+    }
+
+    @Test
+    public void testCreateFormation() throws IOException {
+        // Create mock MultipartFile instances
+        MultipartFile imageFile = new MockMultipartFile("image.jpg", "image.jpg", "image/jpeg", "some image data".getBytes());
+        MultipartFile brochureFile = new MockMultipartFile("brochure.pdf", "brochure.pdf", "application/pdf", "some brochure data".getBytes());
+
+        FormationDto formationDto = new FormationDto(
+                "",
+                "Test Formation Title",
+                "Test Formation Description",
+                "Test Objectives",
+                "Test Content",
+                imageFile,
+                19.99f,
+                "Test Category",
+                brochureFile
+        );
+        // Mock dependencies
+        when(formationRepository.findFormationByTitre(formationDto.titre())).thenReturn(Optional.empty());
+        Formation formationEntity = new Formation(); // Expected entity after mapping
+        when(formationMapper.formationDtoToEntity(formationDto)).thenReturn(formationEntity);
+        FileData imageFileData = new FileData(); // Mock file data
+        when(fileManager.uploadFile(formationDto.imageUrl())).thenReturn(imageFileData);
+        FileData brochureFileData = new FileData(); // Mock file data
+        when(fileManager.uploadFile(formationDto.brochureUrl())).thenReturn(brochureFileData);
+        when(formationRepository.save(formationEntity)).thenReturn(formationEntity); // Simulate saving
+
+        Formation createdFormation = formationService.createFormation(formationDto);
+
+        assertEquals(formationEntity, createdFormation);
+
+    }
 }
-

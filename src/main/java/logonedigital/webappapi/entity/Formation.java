@@ -44,7 +44,8 @@ public class Formation implements Serializable {
     @Column(columnDefinition = "TEXT")
     private String contenu;
 
-    private String imageUrl;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private FileData imageUrl;
 
     @DecimalMin(value = "0.0", message = "Prix cannot be negative")
     private Float prix;
@@ -52,6 +53,9 @@ public class Formation implements Serializable {
     @NotBlank(message = "Categorie is required")
     private String categorie;
 
-    private String brochureFile;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private FileData brochureFile;
 
+    public Formation(int i, String s, String s1, float v, String categorie) {
+    }
 }
