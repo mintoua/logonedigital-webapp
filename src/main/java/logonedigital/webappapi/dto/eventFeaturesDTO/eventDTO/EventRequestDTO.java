@@ -1,8 +1,10 @@
 package logonedigital.webappapi.dto.eventFeaturesDTO.eventDTO;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -19,5 +21,7 @@ public class EventRequestDTO {
     private String lieu;
     private String details;
     private Integer idCategoryEvent;
+    @NotNull(message = "You must upload an image")
+    private MultipartFile imageFile;
 }
 

@@ -1,9 +1,9 @@
 package logonedigital.webappapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,10 @@ import java.util.Date;
 @Setter
 @Getter
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Event implements Serializable {
+    //TODO réglé le problème de référence circulaire dans cette entité
     @Serial
     private static final long serialVersionUID = 1L;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,12 +40,18 @@ public class Event implements Serializable {
     private Date updatedAt;
     private Double duree;
     private Integer nbPlace;
+    private Integer nbPlaceRestante;
     private String lieu;
     @Column(columnDefinition = "TEXT")
     private String details;
-    @ManyToOne
-    private CategoryEvent categoryEvent;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "event_id_event_category_id")
+    @JsonIgnoreProperties("events")
+    private EventCategory eventCategory;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("events")
     private EventParticipant eventParticipant;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private FileData imgUrl;
 
 }
