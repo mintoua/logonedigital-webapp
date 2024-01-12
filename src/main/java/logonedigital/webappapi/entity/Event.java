@@ -48,9 +48,7 @@ public class Event implements Serializable {
     @JoinColumn(name = "event_id_event_category_id")
     @JsonIgnoreProperties("events")
     private EventCategory eventCategory;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties("events")
-    private EventParticipant eventParticipant;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private FileData imgUrl;
 
