@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping(path = "/api/categories_post")
+@RequestMapping(path = "/api")
 @Slf4j
 @Tag(name="PostsCategory APIs")
 public class PostCategoryController {
@@ -32,7 +32,7 @@ public class PostCategoryController {
             @ApiResponse(responseCode = "400", description = "This PostCategory already exist!"),
             @ApiResponse(responseCode = "201", description = "Successfully saved!")
     })
-    @PostMapping
+    @PostMapping("/admin/categories_post")
     public ResponseEntity<PostCategory> addPostCategory(@Valid @RequestBody PostCategoryReqDTO postCategoryReqDTO) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -67,7 +67,7 @@ public class PostCategoryController {
             @ApiResponse(responseCode = "202", description = "Post Category's deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Not found - The PostCategory wasn't found")
     })
-    @DeleteMapping("/{slug}")
+    @DeleteMapping("/admin/categories_post/{slug}")
     public ResponseEntity<String> deletedCategoryPost(@PathVariable(name = "slug") String slug){
         this.categoryPostService.deleteCategoryPost(slug);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
@@ -79,7 +79,7 @@ public class PostCategoryController {
             @ApiResponse(responseCode = "202", description = "Post Category's edited successfully"),
             @ApiResponse(responseCode = "404", description = "Not found - The PostCategory wasn't found")
     })
-    @PutMapping("/{slug}")
+    @PutMapping("/admin/categories_post/{slug}")
     public ResponseEntity<PostCategory> editCategoryPost(@PathVariable(name = "slug") String slug, @Valid @RequestBody PostCategory postCategory){
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
