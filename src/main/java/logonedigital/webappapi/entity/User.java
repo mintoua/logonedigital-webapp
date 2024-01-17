@@ -22,12 +22,17 @@ public class User {
     private String email;
     private String password;
     private Boolean isActivated;
+    private Boolean isBlocked;
     @Column(columnDefinition = "datetime")
     private Instant createdAt;
     @Column(columnDefinition = "datetime")
     private Instant updatedAt;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
+
 
 }

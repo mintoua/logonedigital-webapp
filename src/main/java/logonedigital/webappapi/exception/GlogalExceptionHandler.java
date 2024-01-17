@@ -29,16 +29,54 @@ public class GlogalExceptionHandler {
     );
 }
 
+@ExceptionHandler(ProcessFailureException.class)
+public ResponseEntity<ErrorMessage> processFailureExceptionHandler(Exception ex){
+        return ResponseEntity
+                .status(500)
+                .body(ErrorMessage.build(
+                        ex.getMessage(),
+                        HttpStatus.SERVICE_UNAVAILABLE.value(),
+                        new Date(),
+                        HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase()
+                ));
+}
+
 @ResponseBody
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 @ExceptionHandler(ResourceExistException.class)
-public ErrorMessage ResourceExistExceptionHandler(Exception ex){
+public ErrorMessage resourceExistExceptionHandler(Exception ex){
         return ErrorMessage.build(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST.value(),
                 new Date(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase()
         );
+}
+
+@ExceptionHandler(InvalidCredentialException.class)
+public ResponseEntity<ErrorMessage> InvalidCredentialExceptionHandler(Exception ex){
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(
+                        ErrorMessage.build(
+                                ex.getMessage(),
+                                HttpStatus.FORBIDDEN.value(),
+                                new Date(),
+                                HttpStatus.FORBIDDEN.getReasonPhrase()
+                        ));
+}
+    @ExceptionHandler(AccountException.class)
+public ResponseEntity<ErrorMessage> accountExceptionHandler(Exception ex){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ErrorMessage.build(
+                                ex.getMessage(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                new Date(),
+                                HttpStatus.BAD_REQUEST.getReasonPhrase()
+                        )
+                );
 }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
