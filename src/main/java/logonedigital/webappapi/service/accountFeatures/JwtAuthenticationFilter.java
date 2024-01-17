@@ -1,0 +1,66 @@
+package logonedigital.webappapi.service.accountFeatures;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import logonedigital.webappapi.exception.InvalidCredentialException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Service
+@Slf4j
+@Lazy
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private final JWTService jwtService;
+    private final UserDetailsService userDetailsService;
+
+    public JwtAuthenticationFilter(JWTService jwtService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
+        String username = null;
+        boolean isTokenExpired = true;
+        String token = null;
+
+        if(StringUtils.isNotEmpty(authHeader) && StringUtils.startsWith(authHeader,"Bearer ")){
+            token = authHeader.substring(7);
+            username = this.jwtService.extractUsername(token);
+            isTokenExpired = this.jwtService.isTokenExpired(token);
+        }
+
+        if(StringUtils.isNotEmpty(username) && SecurityContextHolder.getContext().getAuthentication()==null){
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if(isTokenExpired)
+                throw new InvalidCredentialException("Token expired");
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            securityContext.setAuthentication(auth);
+            SecurityContextHolder.setContext(securityContext);
+        }
+
+        log.info("{}", this.jwtService.isTokenExpired(token));
+
+        filterChain.doFilter(request,response);
+    }
+}

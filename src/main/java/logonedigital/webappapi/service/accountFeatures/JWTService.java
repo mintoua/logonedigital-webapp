@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
@@ -56,5 +57,30 @@ public class JWTService {
 
         final byte[] decode = Decoders.BASE64.decode(this.environment.getProperty("encryption.key"));
         return Keys.hmacShaKeyFor(decode);
+    }
+
+    public String extractUsername(String token){
+        return this.getClaim(token, Claims::getSubject);
+    }
+
+    public Boolean isTokenExpired(String token){
+
+        return this.getClaim(token, Claims::getExpiration).before(new Date());
+    }
+
+//    private Date extractExpirationDateFromToken(String token){
+//        return this.getClaim(token, Claims::getExpiration);
+//    }
+
+    private <T> T getClaim(String token, Function<Claims,T> function){
+        return function.apply(this.getAllClaims(token));
+    }
+
+    private Claims getAllClaims(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(this.getKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
