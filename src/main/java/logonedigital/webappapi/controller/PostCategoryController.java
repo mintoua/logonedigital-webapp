@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -33,6 +35,7 @@ public class PostCategoryController {
             @ApiResponse(responseCode = "400", description = "This PostCategory already exist!"),
             @ApiResponse(responseCode = "201", description = "Successfully saved!")
     })
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DIRECTION')")
     @PostMapping("/admin/categories_post")
     public ResponseEntity<PostCategory> addPostCategory(@Valid @RequestBody PostCategoryReqDTO postCategoryReqDTO) {
         return ResponseEntity
@@ -63,11 +66,12 @@ public class PostCategoryController {
                 .body(this.categoryPostService.getCategoryPost(slug));
     }
 
-    @Operation(summary = "Delete PostCategory by slug", description = "return PostCategory deleted successfully!")
+    @Operation(summary = "Delete PostCategory by slug", description = "return PostCategory deleted successfully!", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Post Category's deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Not found - The PostCategory wasn't found")
     })
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DIRECTION')")
     @DeleteMapping("/admin/categories_post/{slug}")
     public ResponseEntity<String> deletedCategoryPost(@PathVariable(name = "slug") String slug){
         this.categoryPostService.deleteCategoryPost(slug);

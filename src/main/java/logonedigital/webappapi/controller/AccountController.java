@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,7 +34,7 @@ public class AccountController {
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
 
-    @Operation(summary = "Registration Api", description = "return PostCategory")
+    @Operation(summary = "Registration Api", description = "return Message")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "User already exist!"),
             @ApiResponse(responseCode = "201", description = "Successfully saved!")
@@ -57,8 +59,28 @@ public class AccountController {
                 .status(HttpStatus.ACCEPTED)
                 .body("Your account activated successfully!");
     }
+    //Todo se rassurer que l'utilisateur est authentifier pour ajouter un role
+    @Operation(summary = "Add Role To User Api", description = "return Message", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "User already exist!"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "201", description = "Successfully saved!")
+    })
+    @PreAuthorize("hasRole('ROLE_DIRECTION')")
+    @PutMapping("/account/add-role-to-user")
+    public ResponseEntity<String> addRoleToUser(@RequestBody AddRoleToUserDTO addRoleToUserDTO){
+        this.accountService.addRoleToUser(addRoleToUserDTO);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body("Your account activated successfully!");
+    }
 
-    @PostMapping("account/reset-password")
+    @Operation(summary = "Reset Password API", description = "return Message")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Something wrong !"),
+            @ApiResponse(responseCode = "200", description = "Code was send you by email!")
+    })
+    @PutMapping("account/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody EditPasswordDTO editPasswordDTO){
         this.accountService.editPassword(editPasswordDTO);
         return ResponseEntity
@@ -66,7 +88,12 @@ public class AccountController {
                 .body("Code was send you by email!");
     }
 
-    @PostMapping("account/new-password")
+    @Operation(summary = "Update Password API", description = "return Message")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Something wrong !"),
+            @ApiResponse(responseCode = "200", description = "Password edit successfully!")
+    })
+    @PutMapping("account/new-password")
     public ResponseEntity<String> newPassword(@RequestBody NewPasswordReqDTO newPasswordReqDTO){
         this.accountService.saveNewPassword(newPasswordReqDTO);
         return ResponseEntity

@@ -13,15 +13,20 @@ import logonedigital.webappapi.repository.ActivationRepo;
 import logonedigital.webappapi.repository.RoleRepo;
 import logonedigital.webappapi.repository.UserRepo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Transactional
+@Slf4j
 public class AccountServiceImpl implements AccountService {
 
     private final UserRepo userRepo;
@@ -51,6 +56,22 @@ public class AccountServiceImpl implements AccountService {
         user=this.userRepo.save(user);
         //generate activation code and send it by using the email service
         this.activationService.saveActivationCode(user);
+    }
+
+    @Override
+    public void addRoleToUser(AddRoleToUserDTO addRoleToUserDTO) throws RessourceNotFoundException {
+        User user = this.userRepo
+                .findByEmail(addRoleToUserDTO.email())
+                .orElseThrow(()-> new RessourceNotFoundException("User not found !"));
+        Role role = this.roleRepo
+                .findByDesignation(addRoleToUserDTO.roleDesignation())
+                .orElseThrow(()-> new RessourceNotFoundException("Role not found !"));
+        List<Role> roleList = user.getRoles();
+        roleList.add(role);
+        user.setRoles(roleList);
+        user.setCreatedAt(Instant.now());
+
+        this.userRepo.save(user);
     }
 
     @Override

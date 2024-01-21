@@ -57,16 +57,18 @@ public class JWTService {
         this.disableToken(user);
         Map<String, String> jwtMap = new java.util.HashMap<>(this.buildJwtToken(user));
         //TODO à l'aide d'un cronjob desactivé le token lorsque la date d'expiration est atteinte
+        //refreshToken expired after 2 months
         RefreshToken refreshToken = RefreshToken.build(
                 null,
                 UUID.randomUUID().toString(),
                 Instant.now(),
-                Instant.now().plusMillis(30*60*1000),
+                Instant.now().plusMillis(60 * 24 * 60 * 1000),
                 false);
 
 
         AccessToken accessToken = new AccessToken();
         accessToken.setValue(jwtMap.get(BEARER));
+       // accessToken.setExpiredAt();
         accessToken.setIsExpired(false);
         accessToken.setIsEnabled(false);
         accessToken.setUser(user);
@@ -79,7 +81,8 @@ public class JWTService {
 
     private Map<String, String> buildJwtToken(User user){
         long currentTime = System.currentTimeMillis();
-        long expirationTime = currentTime +  60 * 1000;
+        //accessToken expired after 1 month
+        long expirationTime = currentTime +  30 * 24 * 60 * 1000;
 
         Map<String, Object>claims = Map.of(
                 "firstname",user.getFirstname(),

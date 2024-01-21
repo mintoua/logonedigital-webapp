@@ -93,8 +93,7 @@ public class ActivationServiceImpl implements ActivationService {
         }
     }
 
-    //@Scheduled(cron = "@daily")
-    @Scheduled(cron = "*/30 * * * * *")
+    @Scheduled(cron = "@daily")
     public void clearExpiredActivationCode(){
         log.info("suppression du code d'activation à {}", Instant.now());
         this.activationRepo.deleteAllByExpiredAtBefore(Instant.now());
