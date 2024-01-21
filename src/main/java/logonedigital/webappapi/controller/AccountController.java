@@ -4,9 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import logonedigital.webappapi.dto.accountFeaturesDTO.ActivationDTO;
-import logonedigital.webappapi.dto.accountFeaturesDTO.LoginDTO;
-import logonedigital.webappapi.dto.accountFeaturesDTO.UserReqDTO;
+import logonedigital.webappapi.dto.accountFeaturesDTO.*;
 import logonedigital.webappapi.exception.AccountException;
 import logonedigital.webappapi.exception.InvalidCredentialException;
 import logonedigital.webappapi.exception.ProcessFailureException;
@@ -16,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -59,6 +58,22 @@ public class AccountController {
                 .body("Your account activated successfully!");
     }
 
+    @PostMapping("account/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody EditPasswordDTO editPasswordDTO){
+        this.accountService.editPassword(editPasswordDTO);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body("Code was send you by email!");
+    }
+
+    @PostMapping("account/new-password")
+    public ResponseEntity<String> newPassword(@RequestBody NewPasswordReqDTO newPasswordReqDTO){
+        this.accountService.saveNewPassword(newPasswordReqDTO);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body("Password edit successfully!");
+    }
+
     @Operation(summary = "Login API", description = "return connected successfully")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Something wrong !"),
@@ -81,6 +96,13 @@ public class AccountController {
                 .body(this.jwtService.generateToken(loginDTO.email()));
     }
 
+    @PostMapping("account/refresh-token")
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> refreshTokenReq){
+        return ResponseEntity
+                .status(200)
+                .body(this.jwtService.refreshToken(refreshTokenReq));
+    }
+
     @Operation(summary = "Logout Api", description = "Return Message", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Please provide a correct token !"),
@@ -89,8 +111,10 @@ public class AccountController {
     @PostMapping("account/logout")
     public ResponseEntity<String> logout(){
         this.jwtService.logout();
-        return ResponseEntity.
-                status(200)
+        return ResponseEntity
+                .status(200)
                 .body("Logout successfully");
     }
+
+
 }

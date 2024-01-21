@@ -20,5 +20,9 @@ public interface AccessTokenRepo extends JpaRepository<AccessToken, Integer> {
     @Query("select a from AccessToken a where a.user.email=:email")
     Stream<AccessToken> fetchAllAccessTokenByEmail(String email);
 
+    @Query("select a from AccessToken a where a.refreshToken.value=:value")
+    Optional<AccessToken> fetchAccessTokenByRefreshTokenValue(@Param("value") String value);
+
     void deleteAllByIsEnabledAndIsExpired(Boolean isExpired, Boolean isEnable);
+
 }

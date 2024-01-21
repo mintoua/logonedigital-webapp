@@ -1,9 +1,7 @@
 package logonedigital.webappapi.service.accountFeatures;
 
 
-import logonedigital.webappapi.dto.accountFeaturesDTO.ActivationDTO;
-import logonedigital.webappapi.dto.accountFeaturesDTO.LoginDTO;
-import logonedigital.webappapi.dto.accountFeaturesDTO.UserReqDTO;
+import logonedigital.webappapi.dto.accountFeaturesDTO.*;
 import logonedigital.webappapi.entity.Activation;
 import logonedigital.webappapi.entity.Role;
 import logonedigital.webappapi.entity.User;
@@ -83,6 +81,34 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void login(LoginDTO loginDTO) {
+
+    }
+
+    @Override
+    public void editPassword(EditPasswordDTO editPasswordDTO) {
+       User user = this.userRepo
+               .findByEmail(editPasswordDTO.email())
+               .orElseThrow(()-> new RessourceNotFoundException("User not found!"));
+       this.activationService.saveActivationCode(user);
+    }
+
+    @Override
+    public void saveNewPassword(NewPasswordReqDTO newPasswordReqDTO) {
+        if (!newPasswordReqDTO.newPassword().equals(newPasswordReqDTO.newPaswordConfirm()))
+            throw new AccountException("Password and Password confirm must match");
+
+        User user = this.userRepo
+                .findByEmail(newPasswordReqDTO.email())
+                .orElseThrow(()-> new RessourceNotFoundException("User not found!"));
+
+        Activation activation = this.activationService.fetchByActivationCode(newPasswordReqDTO.code());
+
+        if(activation.getUser().getEmail().equals(user.getEmail())){
+            String newPassword = this.passwordEncoder.encode(newPasswordReqDTO.newPassword());
+            user.setPassword(newPassword);
+            user.setUpdatedAt(Instant.now());
+            this.userRepo.saveAndFlush(user);
+        }
 
     }
 }

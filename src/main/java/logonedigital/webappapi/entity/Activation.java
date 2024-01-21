@@ -10,10 +10,10 @@ import java.time.Instant;
 
 @Setter
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "build")
 @NoArgsConstructor
 @Entity
-@Table(name = "activations")
+@Table(name = "activations", uniqueConstraints = @UniqueConstraint(columnNames = "id"))
 public class Activation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -21,10 +21,13 @@ public class Activation {
     @Column(columnDefinition = "datetime")
     private Instant createdAt;
     @Column(columnDefinition = "datetime")
+    private Instant updatedAt;
+
+    @Column(columnDefinition = "datetime")
     private Instant expiredAt;
     @Column(columnDefinition = "datetime")
     private Instant activatedAt;
     private String activationCode;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private User user;
 }

@@ -6,7 +6,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import logonedigital.webappapi.entity.AccessToken;
+import logonedigital.webappapi.entity.RefreshToken;
 import logonedigital.webappapi.entity.User;
+import logonedigital.webappapi.exception.AccountException;
 import logonedigital.webappapi.exception.RessourceNotFoundException;
 import logonedigital.webappapi.repository.AccessTokenRepo;
 import logonedigital.webappapi.repository.UserRepo;
@@ -24,8 +26,8 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 public class JWTService {
 
     public static final String BEARER = "bearer";
+    public static final String REFRESH = "refresh";
     private final Environment environment;
     private final UserRepo userRepo;
     private final AccessTokenRepo accessTokenRepo;
@@ -52,21 +55,31 @@ public class JWTService {
         User user = userRepo.findByEmail(username)
                 .orElseThrow(()->new RessourceNotFoundException("User not found !"));
         this.disableToken(user);
-        Map<String, String> jwtMap = this.buildJwtToken(user);
+        Map<String, String> jwtMap = new java.util.HashMap<>(this.buildJwtToken(user));
         //TODO à l'aide d'un cronjob desactivé le token lorsque la date d'expiration est atteinte
+        RefreshToken refreshToken = RefreshToken.build(
+                null,
+                UUID.randomUUID().toString(),
+                Instant.now(),
+                Instant.now().plusMillis(30*60*1000),
+                false);
+
+
         AccessToken accessToken = new AccessToken();
         accessToken.setValue(jwtMap.get(BEARER));
         accessToken.setIsExpired(false);
         accessToken.setIsEnabled(false);
         accessToken.setUser(user);
         accessToken.setCreatedAt(Instant.now());
+        accessToken.setRefreshToken(refreshToken);
         this.accessTokenRepo.save(accessToken);
+        jwtMap.put(REFRESH, refreshToken.getValue());
         return jwtMap;
     }
 
     private Map<String, String> buildJwtToken(User user){
         long currentTime = System.currentTimeMillis();
-        long expirationTime = currentTime * 30 * 60;
+        long expirationTime = currentTime +  60 * 1000;
 
         Map<String, Object>claims = Map.of(
                 "firstname",user.getFirstname(),
@@ -102,9 +115,6 @@ public class JWTService {
         return this.getClaim(token, Claims::getExpiration).before(new Date());
     }
 
-//    private Date extractExpirationDateFromToken(String token){
-//        return this.getClaim(token, Claims::getExpiration);
-//    }
 
     private <T> T getClaim(String token, Function<Claims,T> function){
         return function.apply(this.getAllClaims(token));
@@ -113,6 +123,7 @@ public class JWTService {
     private Claims getAllClaims(String token){
         //todo mettre une exception pour gérer les erreurs lors de la manipution des tokens
         //todo gérer les exceptions liées à la corruption d'un token
+        //gérer les exceptions de tokens expirés
         return Jwts.parserBuilder()
                 .setSigningKey(this.getKey())
                 .build()
@@ -141,5 +152,16 @@ public class JWTService {
     public void removeUselessAccessToken(){
         log.info("Suppression des tokens à {}", Instant.now());
         this.accessTokenRepo.deleteAllByIsEnabledAndIsExpired(true,true);
+    }
+
+    public Map<String, String> refreshToken(Map<String, String> refreshTokenReq) {
+       final AccessToken accessToken = this.accessTokenRepo
+                .fetchAccessTokenByRefreshTokenValue(refreshTokenReq.get(REFRESH))
+                .orElseThrow(()->new RessourceNotFoundException("Refresh Token Invalid !"));
+       if(accessToken.getRefreshToken().getIsExpired() || accessToken.getRefreshToken().getExpiredAt().isBefore(Instant.now()))
+           throw new AccountException("Refresh Token Expired !");
+
+        return this.generateToken(accessToken.getUser().getEmail());
+
     }
 }

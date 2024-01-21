@@ -7,4 +7,6 @@ import logonedigital.webappapi.entity.User;
 public interface ActivationService {
     void saveActivationCode(User user);
     Activation fetchByActivationCode(String code);
+    void saveActivationCodeWhenResetPassword(User user);
+
 }

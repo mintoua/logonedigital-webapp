@@ -1,8 +1,6 @@
 package logonedigital.webappapi.service.accountFeatures;
 
-import logonedigital.webappapi.dto.accountFeaturesDTO.ActivationDTO;
-import logonedigital.webappapi.dto.accountFeaturesDTO.LoginDTO;
-import logonedigital.webappapi.dto.accountFeaturesDTO.UserReqDTO;
+import logonedigital.webappapi.dto.accountFeaturesDTO.*;
 
 
 public interface AccountService {
@@ -13,4 +11,8 @@ public interface AccountService {
     void activateAccount(ActivationDTO activationDTO);
 
     void login(LoginDTO loginDTO);
+
+    void editPassword(EditPasswordDTO editPasswordDTO);
+
+    void saveNewPassword(NewPasswordReqDTO newPasswordReqDTO);
 }
