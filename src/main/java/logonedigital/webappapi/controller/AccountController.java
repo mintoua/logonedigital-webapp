@@ -3,6 +3,7 @@ package logonedigital.webappapi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import logonedigital.webappapi.dto.accountFeaturesDTO.ActivationDTO;
 import logonedigital.webappapi.dto.accountFeaturesDTO.LoginDTO;
 import logonedigital.webappapi.dto.accountFeaturesDTO.UserReqDTO;
@@ -66,6 +67,7 @@ public class AccountController {
     })
     @PostMapping("account/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginDTO loginDTO){
+        //TODO vérifier si le compte de l'utilisateur est actif avand d'autoriser la connexion
 
         Authentication authentication =this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDTO.email(),loginDTO.password())
@@ -77,5 +79,18 @@ public class AccountController {
         return ResponseEntity
                 .status(200)
                 .body(this.jwtService.generateToken(loginDTO.email()));
+    }
+
+    @Operation(summary = "Logout Api", description = "Return Message", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Please provide a correct token !"),
+            @ApiResponse(responseCode = "200", description = "Successfully logout!")
+    })
+    @PostMapping("account/logout")
+    public ResponseEntity<String> logout(){
+        this.jwtService.logout();
+        return ResponseEntity.
+                status(200)
+                .body("Logout successfully");
     }
 }

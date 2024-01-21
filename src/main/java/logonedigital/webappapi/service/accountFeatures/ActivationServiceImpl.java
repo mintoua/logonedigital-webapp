@@ -1,6 +1,5 @@
 package logonedigital.webappapi.service.accountFeatures;
 
-import logonedigital.webappapi.dto.accountFeaturesDTO.ActivationDTO;
 import logonedigital.webappapi.entity.Activation;
 import logonedigital.webappapi.entity.User;
 import logonedigital.webappapi.exception.ProcessFailureException;

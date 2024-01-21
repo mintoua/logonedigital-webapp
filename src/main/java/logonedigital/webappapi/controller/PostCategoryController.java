@@ -57,7 +57,7 @@ public class PostCategoryController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieve!"),
             @ApiResponse(responseCode = "404", description = "Not found - The PostCategory wasn't found")
     })
-    @GetMapping("/{slug}")
+    @GetMapping("/public/categories_post/{slug}")
     public ResponseEntity<PostCategory> getCategoryPost(@PathVariable(name = "slug") String slug){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(this.categoryPostService.getCategoryPost(slug));
