@@ -7,7 +7,7 @@ public interface AccountService {
     void registration(UserReqDTO userReqDTO);
     void addRoleToUser(AddRoleToUserDTO addRoleToUserDTO);
     void updateAccount(UserReqDTO userReqDTO, String email);
-    void lockAccount(String email);
+    void disableAccount(String email);
 
     void activateAccount(ActivationDTO activationDTO);
 

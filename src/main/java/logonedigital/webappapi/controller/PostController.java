@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import logonedigital.webappapi.dto.blogFeaturesDTO.PostReqDTO;
 import logonedigital.webappapi.entity.Post;
 import logonedigital.webappapi.service.blogFeatures.post.PostService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -24,13 +25,12 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/posts")
 @Slf4j
+@RequiredArgsConstructor
 @Tag(name="Post APIs")
 public class PostController {
     private final PostService postService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
+
 
     @Operation(summary = "add new Post", description = "return Post")
     @ApiResponses(value = {

@@ -11,5 +11,5 @@ public interface CategoryPostService {
     Page<PostCategory> getCategoriesPost(int offset, int pageSize);
     PostCategory getCategoryPost(String slug);
     void deleteCategoryPost(String slug);
-    PostCategory editCategoryPost(PostCategory postCategory, String slug);
+    PostCategory editCategoryPost(PostCategoryReqDTO postCategoryReqDTO, String slug);
 }

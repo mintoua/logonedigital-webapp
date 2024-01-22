@@ -14,6 +14,7 @@ import logonedigital.webappapi.repository.RoleRepo;
 import logonedigital.webappapi.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,8 +81,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void lockAccount(String email) {
+    public void disableAccount(String email) {
+        User user = this.userRepo.findByEmail(email)
+                .orElseThrow(()->new RessourceNotFoundException("User not found!"));
 
+        user.setIsActivated(false);
+        user.setUpdatedAt(Instant.now());
+        this.userRepo.saveAndFlush(user);
     }
 
     @Override

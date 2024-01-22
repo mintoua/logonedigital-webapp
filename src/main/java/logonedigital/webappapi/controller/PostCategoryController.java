@@ -35,8 +35,8 @@ public class PostCategoryController {
             @ApiResponse(responseCode = "400", description = "This PostCategory already exist!"),
             @ApiResponse(responseCode = "201", description = "Successfully saved!")
     })
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DIRECTION')")
-    @PostMapping("/admin/categories_post")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DIRECTION')")
+    @PostMapping("/secure/categories_post")
     public ResponseEntity<PostCategory> addPostCategory(@Valid @RequestBody PostCategoryReqDTO postCategoryReqDTO) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -47,7 +47,7 @@ public class PostCategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieve!")
     })
-    @GetMapping("/{offset}/{pageSize}")
+    @GetMapping("/public/categories_post/{offset}/{pageSize}")
     public ResponseEntity<Page<PostCategory>> getCategoriesPost(@PathVariable(name = "offset") int offset,
                                                                 @PathVariable(name = "pageSize") int pageSize) {
         return ResponseEntity
@@ -71,23 +71,24 @@ public class PostCategoryController {
             @ApiResponse(responseCode = "202", description = "Post Category's deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Not found - The PostCategory wasn't found")
     })
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DIRECTION')")
-    @DeleteMapping("/admin/categories_post/{slug}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DIRECTION')")
+    @DeleteMapping("/secure/categories_post/{slug}")
     public ResponseEntity<String> deletedCategoryPost(@PathVariable(name = "slug") String slug){
         this.categoryPostService.deleteCategoryPost(slug);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body("Post Category's deleted successfully!");
     }
 
-    @Operation(summary = "Edit PostCategory by slug", description = "return PostCategory edited successfully as per slug!")
+    @Operation(summary = "Edit PostCategory by slug", description = "return PostCategory edited successfully as per slug!", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Post Category's edited successfully"),
             @ApiResponse(responseCode = "404", description = "Not found - The PostCategory wasn't found")
     })
-    @PutMapping("/admin/categories_post/{slug}")
-    public ResponseEntity<PostCategory> editCategoryPost(@PathVariable(name = "slug") String slug, @Valid @RequestBody PostCategory postCategory){
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DIRECTION')")
+    @PutMapping("/secure/categories_post/{slug}")
+    public ResponseEntity<PostCategory> editCategoryPost(@PathVariable(name = "slug") String slug, @Valid @RequestBody PostCategoryReqDTO postCategoryReqDTO){
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(this.categoryPostService.editCategoryPost(postCategory,slug));
+                .body(this.categoryPostService.editCategoryPost(postCategoryReqDTO,slug));
     }
 }

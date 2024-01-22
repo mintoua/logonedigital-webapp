@@ -9,6 +9,7 @@ import logonedigital.webappapi.entity.AccessToken;
 import logonedigital.webappapi.entity.RefreshToken;
 import logonedigital.webappapi.entity.User;
 import logonedigital.webappapi.exception.AccountException;
+import logonedigital.webappapi.exception.ProcessFailureException;
 import logonedigital.webappapi.exception.RessourceNotFoundException;
 import logonedigital.webappapi.repository.AccessTokenRepo;
 import logonedigital.webappapi.repository.UserRepo;
@@ -88,6 +89,7 @@ public class JWTService {
                 "firstname",user.getFirstname(),
                 "lastname",user.getLastname(),
                 "email",user.getEmail(),
+                "roles",user.getRoles(),
                 Claims.EXPIRATION,new Date(expirationTime),
                 Claims.SUBJECT,user.getEmail()
         );
@@ -133,11 +135,11 @@ public class JWTService {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
-    public AccessToken getTokenByValue(String value) throws RessourceNotFoundException {
+    //Todo Remonter l'exception car s'affiche dans les logs
+    public AccessToken getTokenByValue(String value) throws ProcessFailureException {
         return this.accessTokenRepo
                 .findByValueAndIsEnabledAndIsExpired(value,false, false)
-                .orElseThrow(()->new RessourceNotFoundException("Please provide correct access token!"));
+                .orElseThrow(()->new ProcessFailureException("Please provide correct access token!"));
     }
 
     public void logout() {
@@ -150,7 +152,7 @@ public class JWTService {
         this.accessTokenRepo.save(accessToken);
     }
 
-    @Scheduled(cron = "@daily")
+    @Scheduled(cron = "@weekly")
     //@Scheduled(cron = "* */1 * * * *")
     public void removeUselessAccessToken(){
         log.info("Suppression des tokens à {}", Instant.now());

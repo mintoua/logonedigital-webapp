@@ -61,16 +61,18 @@ public class CategoryPostServiceImpl implements CategoryPostService {
     }
 
     @Override
-    public PostCategory editCategoryPost(PostCategory postCategory, String slug) {
+    public PostCategory editCategoryPost(PostCategoryReqDTO postCategoryReqDTO, String slug) {
         Optional<PostCategory> categoryPostDB = this.postCategoryRepo.findBySlug(slug);
 
         if(categoryPostDB.isEmpty())
             throw new RessourceNotFoundException("This Category's post doesn't exist !");
+        PostCategory postCategory = this.blogFeaturesMapper.fromPostCategoryReqDTO(postCategoryReqDTO);
 
         if(!categoryPostDB.get().getTitle().isEmpty()
                 && !categoryPostDB.get().getTitle().equals(postCategory.getTitle()))
             categoryPostDB.get().setTitle(postCategory.getTitle());
 
+        categoryPostDB.get().setSlug(Tool.slugify(postCategory.getTitle()));
 
         return this.postCategoryRepo.saveAndFlush(categoryPostDB.get());
     }

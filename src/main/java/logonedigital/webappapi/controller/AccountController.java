@@ -130,7 +130,7 @@ public class AccountController {
                 .body(this.jwtService.refreshToken(refreshTokenReq));
     }
 
-    @Operation(summary = "Logout Api", description = "Return Message", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Logout API", description = "Return Message", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Please provide a correct token !"),
             @ApiResponse(responseCode = "200", description = "Successfully logout!")
@@ -141,6 +141,19 @@ public class AccountController {
         return ResponseEntity
                 .status(200)
                 .body("Logout successfully");
+    }
+
+    @Operation(summary = "Disable Account APU", description = "Return Message", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404", description = "User not found!"),
+            @ApiResponse(responseCode = "200", description = "Account Disabled Successfully!")
+    })
+    @PostMapping("account/disable/{email}")
+    public ResponseEntity<String> disableAccount(@PathVariable(name = "email") String email){
+        this.accountService.disableAccount(email);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body("Account disabled successfully !");
     }
 
 
