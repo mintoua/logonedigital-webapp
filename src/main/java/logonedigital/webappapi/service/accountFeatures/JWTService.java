@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import logonedigital.webappapi.dto.accountFeaturesDTO.RefereshTokenReqDTO;
 import logonedigital.webappapi.entity.AccessToken;
 import logonedigital.webappapi.entity.RefreshToken;
 import logonedigital.webappapi.entity.User;
@@ -14,6 +15,7 @@ import logonedigital.webappapi.exception.RessourceNotFoundException;
 import logonedigital.webappapi.repository.AccessTokenRepo;
 import logonedigital.webappapi.repository.UserRepo;
 import logonedigital.webappapi.security.UserDetail;
+import logonedigital.webappapi.utils.Tool;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -58,12 +60,13 @@ public class JWTService {
         this.disableToken(user);
         Map<String, String> jwtMap = new java.util.HashMap<>(this.buildJwtToken(user));
         //TODO à l'aide d'un cronjob desactivé le token lorsque la date d'expiration est atteinte
+        // Todo invalider le refresh token au moment de la création de nouveau token
         //refreshToken expired after 2 months
         RefreshToken refreshToken = RefreshToken.build(
                 null,
                 UUID.randomUUID().toString(),
                 Instant.now(),
-                Instant.now().plusMillis(60 * 24 * 60 * 1000),
+                Instant.now().plusMillis( 90L * 24 * 60 * 60 * 1000),
                 false);
 
 
@@ -83,7 +86,8 @@ public class JWTService {
     private Map<String, String> buildJwtToken(User user){
         long currentTime = System.currentTimeMillis();
         //accessToken expired after 1 month
-        long expirationTime = currentTime +  30 * 24 * 60 * 1000;
+        long expirationTime = currentTime +  30L * 24 * 60 * 60 * 1000;
+        log.info("expiration: {}", expirationTime);
 
         Map<String, Object>claims = Map.of(
                 "firstname",user.getFirstname(),
@@ -159,9 +163,9 @@ public class JWTService {
         this.accessTokenRepo.deleteAllByIsEnabledAndIsExpired(true,true);
     }
 
-    public Map<String, String> refreshToken(Map<String, String> refreshTokenReq) {
+    public Map<String, String> refreshToken(RefereshTokenReqDTO refereshTokenReqDTO) {
        final AccessToken accessToken = this.accessTokenRepo
-                .fetchAccessTokenByRefreshTokenValue(refreshTokenReq.get(REFRESH))
+                .fetchAccessTokenByRefreshTokenValue(Tool.cleanIt(refereshTokenReqDTO.refreshToken()))
                 .orElseThrow(()->new RessourceNotFoundException("Refresh Token Invalid !"));
        if(accessToken.getRefreshToken().getIsExpired() || accessToken.getRefreshToken().getExpiredAt().isBefore(Instant.now()))
            throw new AccountException("Refresh Token Expired !");

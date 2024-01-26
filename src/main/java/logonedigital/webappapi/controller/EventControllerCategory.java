@@ -1,66 +1,94 @@
 package logonedigital.webappapi.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import logonedigital.webappapi.dto.eventFeaturesDTO.eventCategoryReqDTO.EventCategoryDTO;
 import logonedigital.webappapi.entity.EventCategory;
 import logonedigital.webappapi.service.eventFeatures.eventCategory.EventCategoryService;
+import logonedigital.webappapi.utils.Tool;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/categories_event")
+@RequestMapping(path = "/api")
+@RequiredArgsConstructor
 @Slf4j
-@Tag(name="EventCategory APIs")
+@Tag(name="Event Category APIs")
 public class EventControllerCategory {
 
     private final EventCategoryService eventCategoryService;
 
 
-    public EventControllerCategory(EventCategoryService eventCategoryService) {
-        this.eventCategoryService = eventCategoryService;
-    }
 
-    @Operation(summary = "Add new CategoryEvent", description = "Add Category's event")
-    @PostMapping(path = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<EventCategory> addCategoryEvent(@Valid @ModelAttribute EventCategoryDTO eventCategoryDTO) throws IOException
+    @Operation(summary = "Add new CategoryEvent", description = "Add Category's event", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created successfully !"),
+            @ApiResponse(responseCode = "400", description = "Event category already exist !"),
+            @ApiResponse(responseCode = "403", description = "Access deny")
+    })
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DIRECTION')")
+    @PostMapping(path = "/secure/categories_event/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> addCategoryEvent(@Valid @ModelAttribute EventCategoryDTO eventCategoryDTO) throws IOException
     {
 
-        return new ResponseEntity<>(this.eventCategoryService.addCategoryEvent(eventCategoryDTO), HttpStatus.OK);
+        return new ResponseEntity<>("Created successfully !", HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/{slug}")
-    @ResponseBody
-    @ResponseStatus(code = HttpStatus.OK)
-    public EventCategory getCategoryEvent(@PathVariable(name = "slug") String slug){
-        return this.eventCategoryService.getCategoryEvent(slug);
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ok!"),
+            @ApiResponse(responseCode = "404", description = "Resource not found!"),
+    })
+    @GetMapping(path = "/public/categories_event/{slug}")
+    public ResponseEntity<EventCategory> getCategoryEvent(@PathVariable(name = "slug") String slug){
+        return ResponseEntity
+                .status(200)
+                .body(this.eventCategoryService.getCategoryEvent(Tool.cleanIt(slug)));
     }
 
-    @GetMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ok!"),
+    })
+    @GetMapping(path = "/public/categories_event")
     public ResponseEntity<List<EventCategory>> getCategoriesEvent(){
         return new ResponseEntity<>(this.eventCategoryService.getCategoriesEvent(), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/delete/{slug}")
-    @ResponseBody
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public String deleteCategoryEvent(@PathVariable(name = "slug") String slug){
-        this.eventCategoryService.deleteCategoryEvent(slug);
-        return "Element "+ slug +" deleted successfully !";
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ok!"),
+            @ApiResponse(responseCode = "404", description = "Resource not found!"),
+            @ApiResponse(responseCode = "403", description = "Access deny !")
+    })
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DIRECTION')")
+    @DeleteMapping(path = "/secure/categories_event/delete/{slug}")
+    public ResponseEntity<String> deleteCategoryEvent(@PathVariable(name = "slug") String slug){
+        this.eventCategoryService.deleteCategoryEvent(Tool.cleanIt(slug));
+        return ResponseEntity
+                .status(202)
+                .body("Element "+ Tool.cleanIt(slug) +" deleted successfully !");
     }
 
-    @ResponseBody
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
-    @PutMapping(path = "/edit/{slug}")
-    public EventCategory editCategoryEvent(@PathVariable(name = "slug") String slug,
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "ok!"),
+            @ApiResponse(responseCode = "404", description = "Resource not found!"),
+            @ApiResponse(responseCode = "403", description = "Access deny !")
+    })
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DIRECTION')")
+    @PutMapping(path = "/secure/categories_event/edit/{slug}")
+    public ResponseEntity<String> editCategoryEvent(@PathVariable(name = "slug") String slug,
                                            @Valid @RequestBody EventCategory eventCategory){
-        return this.eventCategoryService.editCategoryEvent(slug, eventCategory);
+        this.eventCategoryService.editCategoryEvent(Tool.cleanIt(slug),eventCategory);
+        return ResponseEntity.status(202).body("Edited successfully!");
     }
 }

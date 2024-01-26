@@ -2,6 +2,7 @@ package logonedigital.webappapi.service.blogFeatures.postCategory;
 
 import logonedigital.webappapi.dto.blogFeaturesDTO.PostCategoryReqDTO;
 import logonedigital.webappapi.entity.PostCategory;
+import logonedigital.webappapi.exception.ProcessFailureException;
 import logonedigital.webappapi.exception.ResourceExistException;
 import logonedigital.webappapi.exception.RessourceNotFoundException;
 import logonedigital.webappapi.mapper.BlogFeaturesMapper;
@@ -9,11 +10,15 @@ import logonedigital.webappapi.repository.PostCategoryRepo;
 import logonedigital.webappapi.utils.Tool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -40,6 +45,9 @@ public class CategoryPostServiceImpl implements CategoryPostService {
 
     @Override
     public Page<PostCategory> getCategoriesPost(int offset, int pageSize) {
+        if(pageSize <= 0 || offset < 0)
+            throw new ProcessFailureException("Page Size or Offset couldn't be least than zero");
+
         return this.postCategoryRepo.findAll(PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC,"title")));
     }
 

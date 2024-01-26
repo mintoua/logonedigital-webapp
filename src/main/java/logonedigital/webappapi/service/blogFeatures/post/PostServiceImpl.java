@@ -10,6 +10,7 @@ import logonedigital.webappapi.repository.PostCategoryRepo;
 import logonedigital.webappapi.repository.PostRepo;
 import logonedigital.webappapi.service.fileManager.FileManager;
 import logonedigital.webappapi.utils.Tool;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,21 +21,13 @@ import java.util.Date;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepo postRepo;
     private final BlogFeaturesMapper mapper;
     private final PostCategoryRepo postCategoryRepo;
     private final FileManager fileManager;
 
-    public PostServiceImpl(PostRepo postRepo,
-                           BlogFeaturesMapper mapper,
-                           PostCategoryRepo postCategoryRepo,
-                           FileManager fileManager) {
-        this.postRepo = postRepo;
-        this.mapper = mapper;
-        this.postCategoryRepo = postCategoryRepo;
-        this.fileManager = fileManager;
-    }
 
 
     @Override
@@ -81,6 +74,7 @@ public class PostServiceImpl implements PostService {
 
         this.postRepo.delete(post.get());
     }
+
     private Post setPostProperties(Post post, PostReqDTO postReqDTO) throws IOException {
         if(!postReqDTO.getTitle().isEmpty()
                 && !postReqDTO.getTitle().equals(post.getTitle())){
@@ -107,6 +101,7 @@ public class PostServiceImpl implements PostService {
             throw new RessourceNotFoundException("This post doesn't exist!");
 
        this.setPostProperties(post.get(),postReqDTO);
+
         return this.postRepo.saveAndFlush(this.setPostProperties(post.get(),postReqDTO));
     }
 

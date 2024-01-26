@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import logonedigital.webappapi.dto.accountFeaturesDTO.*;
 import logonedigital.webappapi.exception.AccountException;
 import logonedigital.webappapi.exception.InvalidCredentialException;
 import logonedigital.webappapi.exception.ProcessFailureException;
 import logonedigital.webappapi.service.accountFeatures.AccountService;
 import logonedigital.webappapi.service.accountFeatures.JWTService;
+import logonedigital.webappapi.utils.Tool;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ import java.util.Map;
 @RequestMapping("api/")
 @AllArgsConstructor
 @Slf4j
+@Tag(name = "Account Management APIs", description = "Api to which manage users account")
 public class AccountController {
 
     private final AccountService accountService;
@@ -124,7 +127,7 @@ public class AccountController {
     }
 
     @PostMapping("account/refresh-token")
-    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> refreshTokenReq){
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody RefereshTokenReqDTO refreshTokenReq){
         return ResponseEntity
                 .status(200)
                 .body(this.jwtService.refreshToken(refreshTokenReq));
@@ -150,7 +153,7 @@ public class AccountController {
     })
     @PostMapping("account/disable/{email}")
     public ResponseEntity<String> disableAccount(@PathVariable(name = "email") String email){
-        this.accountService.disableAccount(email);
+        this.accountService.disableAccount(Tool.cleanIt(email));
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body("Account disabled successfully !");

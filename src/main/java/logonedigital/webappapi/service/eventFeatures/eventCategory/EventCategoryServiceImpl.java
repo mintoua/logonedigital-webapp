@@ -1,38 +1,32 @@
 package logonedigital.webappapi.service.eventFeatures.eventCategory;
 
-import com.github.slugify.Slugify;
+
 import logonedigital.webappapi.dto.eventFeaturesDTO.eventCategoryReqDTO.EventCategoryDTO;
 import logonedigital.webappapi.entity.EventCategory;
 import logonedigital.webappapi.exception.ResourceExistException;
 import logonedigital.webappapi.exception.RessourceNotFoundException;
 import logonedigital.webappapi.mapper.EventFeatureMapper;
 import logonedigital.webappapi.repository.CategoryEventRepo;
+import logonedigital.webappapi.utils.Tool;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class EventCategoryServiceImpl implements EventCategoryService {
     private final CategoryEventRepo categoryEventRepo;
     private final EventFeatureMapper eventFeatureMapper;
 
 
-    public EventCategoryServiceImpl(CategoryEventRepo categoryEventRepo, EventFeatureMapper eventFeatureMapper) {
-        this.categoryEventRepo = categoryEventRepo;
-        this.eventFeatureMapper = eventFeatureMapper;
-    }
-
-    private String slugify(String designation){
-        final Slugify slg = Slugify.builder().build();
-        return slg.slugify(designation);
-    }
     @Override
     public EventCategory addCategoryEvent(EventCategoryDTO eventCategoryDTO ) {
 
         EventCategory eventCategory = this.eventFeatureMapper.fromEventCategoryDTO(eventCategoryDTO);
 
-        String slug = this.slugify(eventCategory.getDesignation());
+        String slug = Tool.slugify(eventCategory.getDesignation());
         Optional<EventCategory> optionalCategoryEvent = this.categoryEventRepo.findBySlug(slug);
         if(optionalCategoryEvent.isPresent())
             throw new ResourceExistException("this category of event already exist !");
@@ -69,7 +63,7 @@ public class EventCategoryServiceImpl implements EventCategoryService {
             throw new RessourceNotFoundException("Resource Not Found !");
 
         categoryEventOptional.get().setDesignation(eventCategory.getDesignation());
-        categoryEventOptional.get().setSlug(this.slugify(eventCategory.getDesignation()));
+        categoryEventOptional.get().setSlug(Tool.slugify(eventCategory.getDesignation()));
         return this.categoryEventRepo.saveAndFlush(categoryEventOptional.get());
     }
 

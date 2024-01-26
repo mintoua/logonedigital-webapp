@@ -24,6 +24,7 @@ public class AccessToken implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "value", columnDefinition = "TEXT")
     private String value;
     private Boolean isEnabled;
     private Boolean isExpired;
