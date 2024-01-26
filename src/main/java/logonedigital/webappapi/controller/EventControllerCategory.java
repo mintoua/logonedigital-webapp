@@ -39,13 +39,14 @@ public class EventControllerCategory {
             @ApiResponse(responseCode = "403", description = "Access deny")
     })
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DIRECTION')")
-    @PostMapping(path = "/secure/categories_event/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> addCategoryEvent(@Valid @ModelAttribute EventCategoryDTO eventCategoryDTO) throws IOException
+    @PostMapping(path = "/secure/categories_event/add")
+    public ResponseEntity<String> addCategoryEvent(@Valid EventCategoryDTO eventCategoryDTO)
     {
-
+        this.eventCategoryService.addCategoryEvent(eventCategoryDTO);
         return new ResponseEntity<>("Created successfully !", HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get Event Category ", description = "Get Event Category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ok!"),
             @ApiResponse(responseCode = "404", description = "Resource not found!"),
@@ -57,6 +58,7 @@ public class EventControllerCategory {
                 .body(this.eventCategoryService.getCategoryEvent(Tool.cleanIt(slug)));
     }
 
+    @Operation(summary = "Get Events Category ", description = "Get Events Category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ok!"),
     })
@@ -65,6 +67,8 @@ public class EventControllerCategory {
         return new ResponseEntity<>(this.eventCategoryService.getCategoriesEvent(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete Event Category ", description = "Delete Event Category",
+    security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ok!"),
             @ApiResponse(responseCode = "404", description = "Resource not found!"),
@@ -79,6 +83,8 @@ public class EventControllerCategory {
                 .body("Element "+ Tool.cleanIt(slug) +" deleted successfully !");
     }
 
+    @Operation(summary = "Edit Event Category ", description = "Edit Event Category",
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "ok!"),
             @ApiResponse(responseCode = "404", description = "Resource not found!"),
