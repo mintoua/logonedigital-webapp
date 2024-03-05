@@ -19,6 +19,9 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
     @Query("select p from Post p where p.title = :title")
     Optional<Post> fetchPostByTitle(@Param("title") String title);
 
-    @Query("select p from Post p where p.postCategory.slug = :postCategorySlug")
+    @Query("select p from  Post p where p.published=true")
+    Page<Post> fetchPostByPublished(Pageable pageable);
+
+    @Query("select p from Post p where p.postCategory.slug = :postCategorySlug and p.published=true")
     Page<Post> fetchPostByCategory(@Param("postCategorySlug") String postCategorySlug, Pageable pageable);
 }

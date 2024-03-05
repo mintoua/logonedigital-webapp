@@ -106,7 +106,7 @@ public class PostController {
 
     @Operation(summary = "Get Posts by postCategory", description = "retrieve successfully")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Successfully retrieve!"),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieve!"),
             @ApiResponse(responseCode = "400", description = "Not found - Post doesn't exist inside data base")
     })
     @Parameters(value = {
@@ -120,5 +120,22 @@ public class PostController {
     {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(this.postService.getPostsByCategory(Tool.cleanIt(postCategorySlug),offset,pageSize));
+    }
+
+    @Operation(summary = "Get published Posts", description = "retrieve successfully")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieve!"),
+            @ApiResponse(responseCode = "400", description = "Not found - Post doesn't exist inside data base")
+    })
+    @Parameters(value = {
+            @Parameter(name = "offset", description = "offset value can't be less than 1", example = "1,2,...")
+    }
+    )
+    @GetMapping("public/post/published/{offset}/{pageSize}")
+    public ResponseEntity<Page<Post>> getPusblishedPost(@PathVariable(name = "offset") int offset,
+                                                              @PathVariable(name = "pageSize") int pageSize)
+    {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(this.postService.getPublishedPost(offset,pageSize));
     }
 }

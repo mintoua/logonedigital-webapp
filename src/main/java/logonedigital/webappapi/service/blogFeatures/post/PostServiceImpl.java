@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -90,6 +91,7 @@ public class PostServiceImpl implements PostService {
             throw new RessourceNotFoundException("Post Category's doesn't exist !");
         post.setPostCategory(postCategory.get());
         post.setUpdatedAt(new Date());
+        post.setPublished(false);
         //TODO Régler le problème d'upload d'image lors de l'update
         //post.setImgUrl(this.fileManager.uploadFile(postReqDTO.getImageFile()));
         return post;
@@ -110,5 +112,11 @@ public class PostServiceImpl implements PostService {
         return this.postRepo
                 .fetchPostByCategory(postCategorySlug,
                         PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC, "title")));
+    }
+
+    @Override
+    public Page<Post> getPublishedPost(int offset, int pageSize) {
+
+        return this.postRepo.fetchPostByPublished(PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC, "title")));
     }
 }

@@ -35,6 +35,7 @@ public class Post implements Serializable {
     private String slug;
     @Column(columnDefinition = "TEXT")
     private String content;
+    private Boolean published;
     @Temporal(TemporalType.DATE)
     private Date createdAt;
     @Temporal(TemporalType.DATE)

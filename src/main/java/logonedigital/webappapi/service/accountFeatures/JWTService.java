@@ -146,15 +146,6 @@ public class JWTService {
                 .orElseThrow(()->new ProcessFailureException("Please provide correct access token!"));
     }
 
-    public void logout() {
-        UserDetail user = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        AccessToken accessToken = this.accessTokenRepo
-                .fetchValidAccessTokenByUser(user.getUsername(),false, false)
-                .orElseThrow(()-> new RessourceNotFoundException("Please provide correct access token"));
-        accessToken.setIsEnabled(true);
-        accessToken.setIsExpired(true);
-        this.accessTokenRepo.save(accessToken);
-    }
 
     @Scheduled(cron = "@weekly")
     //@Scheduled(cron = "* */1 * * * *")

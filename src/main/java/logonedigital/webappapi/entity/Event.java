@@ -42,6 +42,7 @@ public class Event implements Serializable {
     private Integer nbPlace;
     private Integer nbPlaceRestante;
     private String lieu;
+    private Boolean published;
     @Column(columnDefinition = "TEXT")
     private String details;
     @ManyToOne(fetch = FetchType.EAGER)

@@ -14,4 +14,5 @@ public interface EventService {
     void deletelEvent(String slug);
     Event editEvent(String slug, EventRequestDTO eventRequestDTO) throws IOException;
     Page<Event> getEventsByEventCategory(String slug, int offset, int pageSize);
+    Page<Event> getPublishedEvents(int offset, int pageSize);
 }

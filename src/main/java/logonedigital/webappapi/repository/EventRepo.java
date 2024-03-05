@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +18,6 @@ public interface EventRepo extends JpaRepository<Event, Integer> {
     Optional<Event> fetchEventByTitle(@Param("title") String title);
     @Query("select e from Event e where e.eventCategory.slug =:slug")
     Page<Event> fetchEventsByEventCategory(@Param("slug") String slug, Pageable pageable);
+    @Query("select e from Event e where  e.published=true")
+    Page<Event> fectchPublishedEvents(Pageable pageable);
 }

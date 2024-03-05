@@ -58,6 +58,18 @@ public class EventController {
                 .body(this.eventService.getEvents(offset, pageSize));
     }
 
+    @Operation(summary = "Get Events", description = "return Events with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieve!")
+    })
+    @GetMapping("public/events/{offset}/{pageSize}")
+    public ResponseEntity<Page<Event>> getPublishedEvents(@PathVariable(name = "offset") int offset,
+                                                 @PathVariable(name = "pageSize") int pageSize)
+    {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(this.eventService.getPublishedEvents(offset, pageSize));
+    }
+
     @Operation(summary = "Get Events by EventCategory", description = "return Events with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieve!")

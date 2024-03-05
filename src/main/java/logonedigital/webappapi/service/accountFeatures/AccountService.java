@@ -6,12 +6,15 @@ import logonedigital.webappapi.dto.accountFeaturesDTO.*;
 public interface AccountService {
     void registration(UserReqDTO userReqDTO);
     void addRoleToUser(AddRoleToUserDTO addRoleToUserDTO);
-    void updateAccount(UserReqDTO userReqDTO, String email);
+    void updateAccount(EditUserDTO editUserDTO, String email);
     void disableAccount(String email);
 
+
     void activateAccount(ActivationDTO activationDTO);
+   void resendActivationCode(String email);
 
     void login(LoginDTO loginDTO);
+    void logout();
 
     void editPassword(EditPasswordDTO editPasswordDTO);
 

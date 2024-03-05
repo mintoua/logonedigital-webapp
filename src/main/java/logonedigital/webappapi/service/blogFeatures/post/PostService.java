@@ -5,6 +5,7 @@ import logonedigital.webappapi.entity.Post;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public interface PostService  {
@@ -14,5 +15,6 @@ public interface PostService  {
     void deletePost(String slug);
     Post editPost(PostReqDTO postReqDTO, String slug) throws IOException;
     Page<Post> getPostsByCategory(String postCategorySlug, int offset, int pageSize);
+    Page<Post> getPublishedPost(int offset, int pageSize);
 
 }

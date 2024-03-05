@@ -40,7 +40,7 @@ public class EventControllerCategory {
     })
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DIRECTION')")
     @PostMapping(path = "/secure/categories_event/add")
-    public ResponseEntity<String> addCategoryEvent(@Valid EventCategoryDTO eventCategoryDTO)
+    public ResponseEntity<String> addCategoryEvent(@Valid @RequestBody EventCategoryDTO eventCategoryDTO)
     {
         this.eventCategoryService.addCategoryEvent(eventCategoryDTO);
         return new ResponseEntity<>("Created successfully !", HttpStatus.CREATED);

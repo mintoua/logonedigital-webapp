@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventCategoryDTO {
-    @NotNull(message = "This field couldn't be null")
     @NotEmpty(message = "This field couldn't be empty")
     @NotBlank(message = "This field couldn't be blank")
     private String designation;

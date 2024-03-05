@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -53,6 +54,7 @@ public class EventServiceImpl implements EventService {
         event.setCreatedAt(new Date());
         event.setSlug(Tool.slugify(event.getTitre()));
         event.setNbPlaceRestante(event.getNbPlace());
+        event.setPublished(false);
         event.setImgUrl(this.fileManager.uploadFile(eventRequestDTO.getImageFile()));
 
         return this.eventRepo.save(event);
@@ -102,6 +104,11 @@ public class EventServiceImpl implements EventService {
     public Page<Event> getEventsByEventCategory(String slug, int offset, int pageSize) {
         return this.eventRepo.fetchEventsByEventCategory(slug,
                 PageRequest.of(offset,pageSize,Sort.by(Sort.Direction.DESC, "createdAt")));
+    }
+
+    @Override
+    public Page<Event> getPublishedEvents(int offset, int pageSize) {
+        return this.eventRepo.fectchPublishedEvents(PageRequest.of(offset,pageSize,Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 
     private Event setEventProperties(Event event, EventRequestDTO eventRequestDTO){
