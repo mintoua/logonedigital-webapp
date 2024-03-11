@@ -24,8 +24,8 @@ public class Session implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer duree;
-    private Integer frequence;
+    private Integer duree; //en mois exemple: 5 (mois)
+    private String frequence;
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
 
